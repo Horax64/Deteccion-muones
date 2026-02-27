@@ -1,0 +1,49 @@
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+from scipy import signal
+import numpy as np
+
+
+num = int(sys.argv[1])  # Convertir el argumento a entero
+print(f"medicion numero {num}")
+
+# Lee el archivo data.txt y carga los datos en un DataFrame
+data = pd.read_csv('mediciones/data.txt', sep=r"\s+", header=None, names=["t1[ns]", "u1[mV]", "u2[mV]", "u3[mV]"])
+
+trig = -40 # [mV]
+
+# Filtro laxante
+
+"""
+print(data["u1[mV]"].min(),data["u2[mV]"].min())
+if data["u1[mV]"].min() < trig:
+    data.to_csv(f"mediciones/decaimientos/data_{num:04d}.txt")
+    print("-------------------------------------------------------------------------------> Guardado")
+else:
+    print("no hay coincidencias")
+"""
+
+def peak(eje_x,eje_y,n,umbral):
+
+    picos= signal.find_peaks(eje_y,distance = n)[0] #encuentra los indices de los picos
+
+    #creo dos variables para almacenar los datos en los picos
+    y_picos=[]
+    x_picos=[]
+    p = np.array([])
+
+    for i in picos:
+        if eje_y[i] > umbral:
+            y_picos.append(eje_y[i])
+            x_picos.append(eje_x[i])
+
+
+    return (np.array(x_picos),np.array(y_picos))
+
+if data["u1[mV]"].min() < trig:
+    print("----------------------------------------------------------------------> pulsos en UP")
+    #t_muon = data["t1[ns]"][data["u1[mV]"] == data["u1[mV]"].min()].values[0]
+    #print(f"pico en {t_muon} ns")
+    data.to_csv(f"/media/publico/KINGSTON/Mediciones_13al18/data_{num:04d}.txt")
